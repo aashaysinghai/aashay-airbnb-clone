@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import authRoute from "./routes/auth.js";
+import cookieParser from "cookie-parser";
 dotenv.config();
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(cookieParser());
 
 console.log(process.env.MONGO_URL);
 mongoose.connect(process.env.MONGO_URL);

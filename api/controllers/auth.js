@@ -25,7 +25,7 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     // find by email and make email as unique.
-    const user = await User.findOne({ username: req.body.username });
+    const user = await User.findOne({ email: req.body.email });
     if (!user) return next(createError(404, "User not found!"));
 
     const isPasswordCorrect = await bcrypt.compare(
@@ -43,14 +43,29 @@ export const login = async (req, res, next) => {
     const { password, isAdmin, ...otherDetails } = user._doc;
 
     res
-      .cookie("access_token", token, {
-        httpOnly: true,
-      })
+      .cookie("access_token", token)
       .status(200)
       .json({ details: { ...otherDetails }, isAdmin });
   } catch (err) {
     next(err);
   }
+};
+
+export const profile = async (req, res) => {
+  const { access_token } = req.cookies;
+  if (access_token) {
+    jwt.verify(access_token, process.env.JWT, {}, async (err, user) => {
+      if (err) throw err;
+      const { username, email, _id } = await User.findById(user.id);
+      res.json({ username, email, _id });
+    });
+  } else {
+    res.json(null);
+  }
+};
+
+export const logout = async (req, res) => {
+  res.cookie("access_token", "").json(true);
 };
 
 export const verify = async (req, res, next) => {};

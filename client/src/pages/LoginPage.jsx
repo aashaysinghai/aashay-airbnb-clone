@@ -1,18 +1,18 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { UserContextProvider } from "../UserContext";
+import { UserContext } from "../UserContext";
 
 export default function IndexPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
-  const setUser = useContext(UserContextProvider);
+  const { setUser } = useContext(UserContext);
   async function handleLoginSubmit(ev) {
     ev.preventDefault();
     try {
       const resp = await axios.post("/auth/login", { email, password });
-      setUser(resp.data);
+      setUser(resp.data.details);
       alert("Login Sucessfull");
       setRedirect(true);
     } catch (err) {
@@ -37,7 +37,7 @@ export default function IndexPage() {
             type="password"
             placeholder="pasword"
             value={password}
-            onChange={(ev) => setpassword(ev.target.value)}
+            onChange={(ev) => setPassword(ev.target.value)}
           />
           <button className="primary" onClick={handleLoginSubmit}>
             Login
